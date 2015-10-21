@@ -1,7 +1,10 @@
 # Getting and Cleaning Data project
 # run_analysis.R script 
+# Author: MSibomana
+
 library(data.table)
 library(dplyr)
+
 read_dataset <- function(datadir,dset,lbl) {
     lname <- paste0(dset,".txt")
     t <- fread(file.path(datadir,dset,paste0("X_",lname)))
@@ -20,13 +23,21 @@ read_dataset <- function(datadir,dset,lbl) {
     res
 }
 
+read_data4 <- function(datadir) {
+    lbl <- fread(file.path(datadir,"features.txt"))
+    train <- read_dataset(datadir,"train",lbl$V2)
+    test <- read_dataset(datadir,"test",lbl$V2)
+    data4 <- bind_rows(train, test)
+}
 
-lbl <- fread(file.path(".","features.txt"))
-train <- read_dataset(".","train",lbl$V2)
-test <- read_dataset(".","test",lbl$V2)
-data4 <- bind_rows(train, test)
-criteria <-list(Dataset=as.factor(data4$Dataset),
+make_data5 <- function(data4) {
+    criteria <-list(Dataset=as.factor(data4$Dataset),
                 Subject=as.factor(data4$Subject),
                 Activity=as.factor(data4$Activity))
-data5 <- aggregate(data4[4:69], by=criteria, mean)
+    data5 <- aggregate(data4[4:69], by=criteria, mean)
+}
 
+read_data5 <- function(datadir) {
+    make_data5(read_data4(datadir))
+}
+    
